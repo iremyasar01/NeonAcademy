@@ -6,32 +6,34 @@ class MemberScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Üyeleri oluştur
+    final ContactMentor = ContactInformation(
+      phoneNumber: '+90 555 123 4567',
+      email: 'hasabektas@gmail.com',
+    );
+    final ContactJr = ContactInformation(
+      phoneNumber: '+90 555 987 6543',
+      email: 'iremyasar@gmail.com',
+    );
     final members = [
       NeonAcademyMember(
-        fullName: 'Ayşe Güneş',
+        fullName: 'Hasan Bektaş',
         title: 'Flutter Mentor',
         horoscope: 'Yay',
-        memberLevel: 'Elite',
+        memberLevel: 'Mentor',
         homeTown: 'İstanbul',
         age: 29,
-        contactInformation: ContactInformation(
-          phoneNumber: '+90 555 111 2233',
-          email: 'ayse.dev@neonacademy.com',
+        contactInformation: ContactMentor,
         ),
-      ),
+    
       NeonAcademyMember(
-        fullName: 'Burak Demir',
-        title: 'UI/UX Designer',
-        horoscope: 'Kova',
-        memberLevel: 'Intermediate',
-        homeTown: 'Ankara',
-        age: 25,
-        contactInformation: ContactInformation(
-          phoneNumber: '+90 532 444 5566',
-          email: 'burak.ui@neonacademy.com',
+        fullName: 'İrem Yaşar',
+        title: 'Flutter Developer',
+        horoscope: 'Koç',
+        memberLevel: 'Beginner',
+        homeTown: 'Hatay',
+        age: 24,
+        contactInformation: ContactJr,
         ),
-      ),
     ];
 
     return Scaffold(
