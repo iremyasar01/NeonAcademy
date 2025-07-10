@@ -1,3 +1,4 @@
+import 'package:neonacademymembers/models/team_model.dart';
 import 'contact_information.dart';
 
 class NeonAcademyMember {
@@ -8,6 +9,7 @@ class NeonAcademyMember {
   final String homeTown;
   final int age;
   final ContactInformation contactInformation;
+  final Team  team;
 
   NeonAcademyMember({
     required this.fullName,
@@ -17,6 +19,7 @@ class NeonAcademyMember {
     required this.homeTown,
     required this.age,
     required this.contactInformation,
+    required this.team,
   });
 
   @override
@@ -28,6 +31,7 @@ Horoscope: $horoscope
 Level: $memberLevel
 Hometown: $homeTown
 Age: $age
+Team: ${team.displayName}
 Contact -> $contactInformation
 ''';
   }

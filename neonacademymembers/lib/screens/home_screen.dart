@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:neonacademymembers/screens/enum_switch_screen.dart';
 import 'package:neonacademymembers/screens/member_screen.dart';
 import 'package:neonacademymembers/screens/task_two_screen.dart';
 
@@ -33,6 +34,16 @@ class HomeScreen extends StatelessWidget {
                 );
               },
               child: const Text('Task Two Screen'),
+            ),
+               const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EnumSwitchScreen()),
+                );
+              },
+              child: const Text('Task Three Screen'),
             ),
           ],
         ),

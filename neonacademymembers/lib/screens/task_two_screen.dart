@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:neonacademymembers/data/members_data.dart';
 import 'package:neonacademymembers/models/neon_academy_members_model.dart';
 import 'package:neonacademymembers/models/contact_information.dart';
+import 'package:neonacademymembers/models/team_model.dart';
 
 class TaskTwoScreen extends StatefulWidget {
   const TaskTwoScreen({super.key});
@@ -117,6 +118,7 @@ class _TaskTwoScreenState extends State<TaskTwoScreen> {
                     phoneNumber: '+90 545 521 1324',
                     email: 'hasanbektas@gmail.com',
                   ),
+                  team: Team.flutterDevelopment,
                 );
                 localMembers.add(mentor);
               }

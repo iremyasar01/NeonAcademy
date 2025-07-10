@@ -1,3 +1,5 @@
+import 'package:neonacademymembers/models/team_model.dart';
+
 import '../models/neon_academy_members_model.dart';
 import '../models/contact_information.dart';
 
@@ -13,6 +15,7 @@ final List<NeonAcademyMember> members = [
       phoneNumber: '+90 555 123 4567',
       email: 'mehmet@gmail.com',
     ),
+      team: Team.flutterDevelopment,
   ),
   NeonAcademyMember(
     fullName: 'İrem Yaşar',
@@ -25,6 +28,7 @@ final List<NeonAcademyMember> members = [
       phoneNumber: '+90 555 987 6543',
       email: 'iremyasar@gmail.com',
     ),
+    team: Team.flutterDevelopment,
   ),
   NeonAcademyMember(
     fullName: 'Esra Yılmaz',
@@ -37,6 +41,7 @@ final List<NeonAcademyMember> members = [
       phoneNumber: '+90 535 976 6647',
       email: 'esra@gmail.com',
     ),
+    team: Team.iosDevelopment,
   ),
   NeonAcademyMember(
     fullName: 'Deniz Türkoğlu',
@@ -49,6 +54,7 @@ final List<NeonAcademyMember> members = [
       phoneNumber: '+90 534 986 9647',
       email: 'deniz@gmail.com',
     ),
+    team: Team.flutterDevelopment,
   ),
   NeonAcademyMember(
     fullName: 'Umut Kaya',
@@ -61,6 +67,7 @@ final List<NeonAcademyMember> members = [
       phoneNumber: '+90 535 976 3465',
       email: 'umut@gmail.com',
     ),
+    team: Team.iosDevelopment,
   ),
   NeonAcademyMember(
     fullName: 'Mert Göksu',
@@ -73,6 +80,7 @@ final List<NeonAcademyMember> members = [
       phoneNumber: '+90 536 456 3435',
       email: 'mert@gmail.com',
     ),
+    team: Team.uiuxDesign,
   ),
   NeonAcademyMember(
     fullName: 'Melih Emre Ergin',
@@ -85,6 +93,7 @@ final List<NeonAcademyMember> members = [
       phoneNumber: '+90 505 123 6892',
       email: 'melih@gmail.com',
     ),
+    team: Team.iosDevelopment,
   ),
   NeonAcademyMember(
     fullName: 'Neslişah Çelik',
@@ -97,6 +106,7 @@ final List<NeonAcademyMember> members = [
       phoneNumber: '+90 536 789 5634',
       email: 'nesli@gmail.com',
     ),
+    team: Team.uiuxDesign,
   ),
   NeonAcademyMember(
     fullName: 'İlayda Arıkan',
@@ -109,6 +119,7 @@ final List<NeonAcademyMember> members = [
       phoneNumber: '+90 536 789 5456',
       email: 'ilayda@gmail.com',
     ),
+    team: Team.uiuxDesign,
   ),
   NeonAcademyMember(
     fullName: 'Oğuzhan Kara',
@@ -121,5 +132,6 @@ final List<NeonAcademyMember> members = [
       phoneNumber: '+90 535 767 5456',
       email: 'oguzhan@gmail.com',
     ),
+    team: Team.flutterDevelopment,
   ),
 ];
