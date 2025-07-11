@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:neonacademymembers/service/travel_preferences.dart';
 
-
 class TravelScreen extends StatefulWidget {
   const TravelScreen({super.key});
 
   @override
- State<TravelScreen>createState() => _TravelScreenState();
+  State<TravelScreen> createState() => _TravelScreenState();
 }
 
 class _TravelScreenState extends State<TravelScreen> {
   final _service = TravelPreferences();
   final TextEditingController _placeController = TextEditingController();
   List<Map<String, dynamic>> _places = [];
- 
 
   @override
   void initState() {
@@ -23,6 +21,7 @@ class _TravelScreenState extends State<TravelScreen> {
 
   Future<void> _loadPlaces() async {
     final loaded = await _service.loadPlaces();
+    if (!mounted) return;
     setState(() {
       _places = loaded;
     });
@@ -32,57 +31,114 @@ class _TravelScreenState extends State<TravelScreen> {
     await _service.savePlaces(_places);
   }
 
-  void _addPlace(String name) {
-  final trimmedName = name.trim();
-  if (trimmedName.isEmpty) return;
+  void _addPlace(String name) async {
+    final trimmedName = name.trim();
+    if (trimmedName.isEmpty) return;
 
-  final alreadyExists = _places.any(
-    (place) => (place['name'] as String).toLowerCase() == trimmedName.toLowerCase(),
-  );
-
-  if (alreadyExists) {
-    ScaffoldMessenger.of(context).showSnackBar(
-       const SnackBar(content: Text('🚫 This place is already in your list!')),
+    final alreadyExists = _places.any(
+      (place) => (place['name'] as String).toLowerCase() == trimmedName.toLowerCase(),
     );
-    return;
-  }
 
-  setState(() {
-    _places.add({'name': trimmedName, 'visitCount': 0});
-  });
-  _savePlaces();
-  _placeController.clear();
-}
+    if (alreadyExists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('🚫 This place is already in your list!')),
+      );
+      return;
+    }
 
-
-  void _markAsVisited(Map<String, dynamic> place) async {
-    final TextEditingController _countController = TextEditingController();
-    await showDialog(
+    final hasVisited = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('How many times have you visited ${place['name']}?'),
-        content: TextField(
-          controller: _countController,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(hintText: 'Enter visit count'),
-        ),
+        title: const Text('Have you been here before?'),
+        content: const Text('Select your experience with this place'),
         actions: [
           TextButton(
-            onPressed: () {
-              final count = int.tryParse(_countController.text);
-              if (count != null && count > 0) {
-                setState(() {
-                  place['visitCount'] = count;
-                });
-                _savePlaces();
-              }
-              Navigator.pop(context);
-            },
-            child: const Text('Save'),
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Not yet! 🌠'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Yes! 🗺️'),
           ),
         ],
       ),
+    ) ?? false;
+
+    if (!mounted) return;
+
+    int visitCount = 0;
+    if (hasVisited) {
+      final count = await showDialog<int>(
+        context: context,
+        builder: (context) => VisitCountDialog(placeName: trimmedName),
+      );
+
+      if (!mounted) return;
+
+      if (count == null || count <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter a valid number')),
+        );
+        return;
+      }
+
+      visitCount = count;
+    }
+
+    setState(() {
+      _places.add({
+        'name': trimmedName,
+        'hasVisited': hasVisited,
+        'visitCount': visitCount,
+      });
+    });
+
+    _savePlaces();
+    _placeController.clear();
+  }
+
+  void _updatePlaceStatus(Map<String, dynamic> place) async {
+    if (place['hasVisited'] == true) return;
+
+    final hasVisited = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Have you visited ${place['name']}?'),
+        content: const Text('Mark this as visited?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Not yet'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Yes!'),
+          ),
+        ],
+      ),
+    ) ?? false;
+
+    if (!mounted || !hasVisited) return;
+
+    final count = await showDialog<int>(
+      context: context,
+      builder: (context) => VisitCountDialog(placeName: place['name']),
     );
+
+    if (!mounted) return;
+
+    if (count == null || count <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid number')),
+      );
+      return;
+    }
+
+    setState(() {
+      place['hasVisited'] = true;
+      place['visitCount'] = count;
+    });
+    _savePlaces();
   }
 
   void _incrementVisit(Map<String, dynamic> place) {
@@ -95,7 +151,10 @@ class _TravelScreenState extends State<TravelScreen> {
   void _decrementVisit(Map<String, dynamic> place) {
     setState(() {
       place['visitCount'] = (place['visitCount'] ?? 1) - 1;
-      if (place['visitCount'] <= 0) place['visitCount'] = 0;
+      if (place['visitCount'] <= 0) {
+        place['visitCount'] = 0;
+        place['hasVisited'] = false;
+      }
     });
     _savePlaces();
   }
@@ -108,10 +167,10 @@ class _TravelScreenState extends State<TravelScreen> {
   }
 
   List<Map<String, dynamic>> get dreamPlaces =>
-      _places.where((p) => (p['visitCount'] ?? 0) == 0).toList();
+      _places.where((p) => p['hasVisited'] == false).toList();
 
   List<Map<String, dynamic>> get visitedPlaces =>
-      _places.where((p) => (p['visitCount'] ?? 0) > 0).toList();
+      _places.where((p) => p['hasVisited'] == true).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +183,7 @@ class _TravelScreenState extends State<TravelScreen> {
             tooltip: 'Clear All',
             onPressed: () async {
               await _service.clearAllData();
+              if (!mounted) return;
               setState(() {
                 _places.clear();
               });
@@ -133,75 +193,193 @@ class _TravelScreenState extends State<TravelScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
+        child: Column(
           children: [
-             const Text("🌍 Enter a dream destination"),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _placeController,
-                    decoration:const InputDecoration(hintText: 'e.g. Tokyo'),
-                  ),
+            
+            Card(
+              elevation: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "🌍 Where do you dream of visiting?",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _placeController,
+                            decoration: const InputDecoration(
+                              hintText: 'Enter a dream destination...',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () => _addPlace(_placeController.text),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue[700],
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                          ),
+                          child: const Text("Add Dream"),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-               const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => _addPlace(_placeController.text),
-                  child: const Text("Add"),
-                ),
-              ],
+              ),
             ),
-           const Divider(height: 30),
-            const Text("🌈 Dream Destinations", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ...dreamPlaces.map((place) => ListTile(
-              title: Text(place['name']),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.check),
-                    tooltip: "Mark as Visited",
-                    onPressed: () => _markAsVisited(place),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    tooltip: "Remove",
-                    onPressed: () => _deletePlace(place),
-                  ),
-                ],
+
+            const SizedBox(height: 20),
+
+            
+            Expanded(
+              child: DefaultTabController(
+                length: 2,
+                child: Column(
+                  children: [
+                    const TabBar(
+                      tabs: [
+                        Tab(icon: Icon(Icons.star, color: Colors.amber), text: "Dream"),
+                        Tab(icon: Icon(Icons.check, color: Colors.green), text: "Visited"),
+                      ],
+                    ),
+                    Expanded(
+                      child: TabBarView(
+                        children: [
+                          dreamPlaces.isEmpty
+                              ? const Center(child: Text("No dream destinations yet!"))
+                              : ListView.builder(
+                                  itemCount: dreamPlaces.length,
+                                  itemBuilder: (context, index) {
+                                    final place = dreamPlaces[index];
+                                    return _buildDreamPlaceCard(place);
+                                  },
+                                ),
+                          visitedPlaces.isEmpty
+                              ? const Center(child: Text("No visited places yet!"))
+                              : ListView.builder(
+                                  itemCount: visitedPlaces.length,
+                                  itemBuilder: (context, index) {
+                                    final place = visitedPlaces[index];
+                                    return _buildVisitedPlaceCard(place);
+                                  },
+                                ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            )),
-             const SizedBox(height: 20),
-             const Text("✅ Visited Places", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ...visitedPlaces.map((place) => ListTile(
-              title: Text(place['name']),
-              subtitle: Text("Visited ${place['visitCount']} time(s)"),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon:const Icon(Icons.add),
-                    tooltip: "Add visit",
-                    onPressed: () => _incrementVisit(place),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.remove),
-                    tooltip: "Remove visit",
-                    onPressed: () => _decrementVisit(place),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    tooltip: "Delete place",
-                    onPressed: () => _deletePlace(place),
-                  ),
-                ],
-              ),
-            )),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDreamPlaceCard(Map<String, dynamic> place) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListTile(
+        leading: const Icon(Icons.star, color: Colors.amber),
+        title: Text(place['name']),
+        subtitle: const Text("Not visited yet"),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.check, color: Colors.green),
+              tooltip: "Mark as visited",
+              onPressed: () => _updatePlaceStatus(place),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              tooltip: "Remove",
+              onPressed: () => _deletePlace(place),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVisitedPlaceCard(Map<String, dynamic> place) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListTile(
+        leading: const Icon(Icons.flag, color: Colors.green),
+        title: Text(place['name']),
+        subtitle: Text("Visited ${place['visitCount']} time(s)"),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.add),
+              tooltip: "Add visit",
+              onPressed: () => _incrementVisit(place),
+            ),
+            IconButton(
+              icon: const Icon(Icons.remove),
+              tooltip: "Remove visit",
+              onPressed: () => _decrementVisit(place),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              tooltip: "Delete place",
+              onPressed: () => _deletePlace(place),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+class VisitCountDialog extends StatelessWidget {
+  final String placeName;
+  final TextEditingController _countController = TextEditingController();
+
+  VisitCountDialog({super.key, required this.placeName});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('How many times have you visited $placeName?'),
+      content: TextField(
+        controller: _countController,
+        keyboardType: TextInputType.number,
+        decoration: const InputDecoration(
+          hintText: 'Enter visit count',
+          border: OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final count = int.tryParse(_countController.text);
+            if (count != null && count > 0) {
+              Navigator.pop(context, count);
+            } else {
+              Navigator.pop(context, null);
+            }
+          },
+          child: const Text('Save'),
+        ),
+      ],
+    );
+  }
+}
+
 
 
