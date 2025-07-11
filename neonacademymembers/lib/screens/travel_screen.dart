@@ -13,7 +13,7 @@ class _TravelScreenState extends State<TravelScreen> {
   final _service = TravelPreferences();
   final TextEditingController _placeController = TextEditingController();
   List<Map<String, dynamic>> _places = [];
-  final TextEditingController _countController = TextEditingController();
+ 
 
   @override
   void initState() {
@@ -33,16 +33,30 @@ class _TravelScreenState extends State<TravelScreen> {
   }
 
   void _addPlace(String name) {
-    if (name.trim().isEmpty) return;
-    setState(() {
-      _places.add({'name': name.trim(), 'visitCount': 0});
-    });
-    _savePlaces();
-    _placeController.clear();
+  final trimmedName = name.trim();
+  if (trimmedName.isEmpty) return;
+
+  final alreadyExists = _places.any(
+    (place) => (place['name'] as String).toLowerCase() == trimmedName.toLowerCase(),
+  );
+
+  if (alreadyExists) {
+    ScaffoldMessenger.of(context).showSnackBar(
+       const SnackBar(content: Text('🚫 This place is already in your list!')),
+    );
+    return;
   }
 
+  setState(() {
+    _places.add({'name': trimmedName, 'visitCount': 0});
+  });
+  _savePlaces();
+  _placeController.clear();
+}
+
+
   void _markAsVisited(Map<String, dynamic> place) async {
-    //final TextEditingController _countController = TextEditingController();
+    final TextEditingController _countController = TextEditingController();
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
