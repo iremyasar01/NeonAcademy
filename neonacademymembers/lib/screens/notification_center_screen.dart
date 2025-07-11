@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notification_center/notification_center.dart';
-import 'package:neonacademymembers/screens/waiting_screen.dart';
+import 'waiting_screen.dart';
 
 class NotificationCenterScreen extends StatelessWidget {
   const NotificationCenterScreen({super.key});
@@ -8,7 +7,7 @@ class NotificationCenterScreen extends StatelessWidget {
   static const String correctCode = '3456';
 
   void _promptForCode(BuildContext context) {
-    final TextEditingController controller = TextEditingController();
+    final controller = TextEditingController();
 
     showDialog(
       context: context,
@@ -22,26 +21,15 @@ class NotificationCenterScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               final enteredCode = controller.text.trim();
-              Navigator.pop(context); // dialogu kapat
+              Navigator.pop(context);
 
               if (enteredCode == correctCode) {
-                // Şifre doğruysa bekleme ekranına git
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => const WaitingScreen(),
                   ),
                 );
-
-               
-                Future.delayed(const Duration(seconds: 15), () {
-                  NotificationCenter().notify(
-                    'decryption_complete',
-                    data: {
-                      'message': '✅ The eagle flies at midnight.',
-                    },
-                  );
-                });
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(

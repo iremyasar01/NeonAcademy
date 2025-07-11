@@ -14,32 +14,25 @@ class _WaitingScreenState extends State<WaitingScreen> {
   String? decryptedMessage;
   Timer? disappearTimer;
   Timer? countdownTimer;
-
   int countdown = 15;
   String encryptedData = "";
 
   @override
   void initState() {
     super.initState();
-
+    _generateEncryptedData();
     _startCountdown();
 
-  
     NotificationCenter().subscribe('decryption_complete', (notification) {
+      if (!mounted) return;
+      
       if (notification is Map<String, dynamic>) {
         final message = notification['message'];
         if (message != null) {
-          setState(() {
-            decryptedMessage = message;
-          });
-
-       
+          setState(() => decryptedMessage = message);
+          
           disappearTimer = Timer(const Duration(seconds: 5), () {
-            if (mounted) {
-              setState(() {
-                decryptedMessage = null;
-              });
-            }
+            if (mounted) setState(() => decryptedMessage = null);
           });
         }
       }
@@ -48,21 +41,26 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
   void _startCountdown() {
     countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      
       setState(() {
         countdown--;
-        _generateEncryptedData(); 
+        _generateEncryptedData();
       });
 
       if (countdown == 0) {
         timer.cancel();
+        NotificationCenter().notify(
+          'decryption_complete',
+          data: {'message': '✅ The eagle flies at midnight.'},
+        );
       }
     });
   }
 
   void _generateEncryptedData() {
     final random = Random();
-    encryptedData = List.generate(10, (_) => random.nextInt(90) + 10)
-        .join(" ");
+    encryptedData = List.generate(10, (_) => random.nextInt(90) + 10).join(" ");
   }
 
   @override
@@ -110,8 +108,17 @@ class _WaitingScreenState extends State<WaitingScreen> {
               ] else ...[
                 Text(
                   decryptedMessage!,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 22, 
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
                   textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "⚠️ Message will disappear in 5 seconds",
+                  style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
                 ),
               ]
             ],
