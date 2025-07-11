@@ -10,6 +10,7 @@ class NeonAcademyMember {
   final int age;
   final ContactInformation contactInformation;
   final Team  team;
+  int? motivationLevel;
 
   NeonAcademyMember({
     required this.fullName,
@@ -20,6 +21,7 @@ class NeonAcademyMember {
     required this.age,
     required this.contactInformation,
     required this.team,
+    this.motivationLevel,
   });
 
   @override
@@ -32,6 +34,7 @@ Level: $memberLevel
 Hometown: $homeTown
 Age: $age
 Team: ${team.displayName}
+Motivation Level: ${motivationLevel ?? 'Not Set'}
 Contact -> $contactInformation
 ''';
   }
