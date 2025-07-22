@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:neonapp/screens/comedy_screen.dart';
 import 'package:neonapp/screens/flexible_screen.dart';
 import 'package:neonapp/screens/future_tech_screen.dart';
 import 'package:neonapp/screens/travel_screen.dart';
@@ -65,6 +66,21 @@ class HomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                   ),
                   child: const Text('future tech'),
+                ),
+                  const SizedBox(height: 20),
+                 ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>  ComedyScreen()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[200],
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.all(20),
+                  ),
+                  child: const Text('Comedy Club'),
                 ),
               ],
             ),
