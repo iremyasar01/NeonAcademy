@@ -4,6 +4,7 @@ import 'package:neonapp/screens/flexible_screen.dart';
 import 'package:neonapp/screens/future_tech_screen.dart';
 import 'package:neonapp/screens/travel_screen.dart';
 import 'package:neonapp/screens/welcome_screen.dart';
+import 'package:neonapp/widgets/purchase_wrapper.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -97,6 +98,21 @@ class HomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                   ),
                   child: const Text('Hero'),
+                ),
+                   const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>const PurchaseWrapper()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[200],
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.all(20),
+                  ),
+                  child: const Text('Adapty'),
                 ),
               ],
             ),
