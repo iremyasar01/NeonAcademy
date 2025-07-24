@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 
 class MazeBackground extends StatelessWidget {
   const MazeBackground({super.key});
@@ -32,3 +32,4 @@ class MazeBackground extends StatelessWidget {
     );
   }
 }
+*/

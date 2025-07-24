@@ -1,12 +1,15 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:neonapp/screens/succes_screen.dart';
 import 'package:neonapp/widgets/transition.dart';
 import '../widgets/direction_button.dart';
 
 class MazeScreen extends StatefulWidget {
   final int step;
+  final XFile? selectedImage; // Resim seçimi için eklendi
 
-  const MazeScreen({super.key, required this.step});
+  const MazeScreen({super.key, required this.step, this.selectedImage});
 
   @override
   State<MazeScreen> createState() => _MazeScreenState();
@@ -23,6 +26,23 @@ class _MazeScreenState extends State<MazeScreen> {
     'left'
   ];
   bool _isTrapped = false;
+  XFile? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedImage = widget.selectedImage;
+  }
+
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _selectedImage = image;
+      });
+    }
+  }
 
   void _navigate(String direction) {
     if (_isTrapped) return;
@@ -31,12 +51,15 @@ class _MazeScreenState extends State<MazeScreen> {
       if (widget.step == correctPath.length - 1) {
         Navigator.pushReplacement(
           context,
-          createFadeRoute(const SuccessScreen()),
+          createFadeRoute(SuccessScreen(selectedImage: _selectedImage)),
         );
       } else {
         Navigator.push(
           context,
-          _getDirectionRoute(direction, MazeScreen(step: widget.step + 1)),
+          _getDirectionRoute(
+            direction,
+            MazeScreen(step: widget.step + 1, selectedImage: _selectedImage),
+          ),
         );
       }
     } else {
@@ -45,7 +68,7 @@ class _MazeScreenState extends State<MazeScreen> {
         if (!mounted) return;
         Navigator.pushAndRemoveUntil(
           context,
-          createFadeRoute(const MazeScreen(step: 0)),
+          createFadeRoute(MazeScreen(step: 0, selectedImage: _selectedImage)),
           (Route<dynamic> route) => false,
         );
       });
@@ -77,12 +100,29 @@ class _MazeScreenState extends State<MazeScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const CircleAvatar(
-                  radius: 60,
-                  backgroundImage: AssetImage('assets/images/maze.jpeg'),
-                  backgroundColor: Colors.transparent,
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 60,
+                    backgroundImage: _selectedImage != null
+                        ? FileImage(File(_selectedImage!.path))
+                        : const AssetImage('assets/images/maze.jpeg')
+                            as ImageProvider,
+                    backgroundColor: Colors.transparent,
+                    child: _selectedImage == null
+                        ? const Icon(Icons.camera_alt, size: 40)
+                        : null,
+                  ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
+                Text(
+                  "Tap image to change",
+                  style: TextStyle(
+                    color: Colors.brown[700],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [

@@ -1,10 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:neonapp/screens/welcome_screen.dart';
 import 'package:neonapp/widgets/transition.dart';
 
-
 class SuccessScreen extends StatelessWidget {
-  const SuccessScreen({super.key});
+  final XFile? selectedImage;
+  const SuccessScreen({super.key, this.selectedImage});
 
   @override
   Widget build(BuildContext context) {
@@ -13,9 +16,11 @@ class SuccessScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 80,
-              backgroundImage: AssetImage('assets/hunter.png'),
+              backgroundImage: selectedImage != null
+                  ? FileImage(File(selectedImage!.path))
+                  : const AssetImage('assets/images/maze.jpeg') as ImageProvider,
               backgroundColor: Colors.transparent,
             ),
             const SizedBox(height: 40),
