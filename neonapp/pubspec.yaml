@@ -79,6 +79,7 @@ flutter:
      - assets/images/tolgshow.jpeg
      - assets/images/improv.jpeg
      - assets/images/comedyfest.jpeg
+     - assets/images/maze.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
