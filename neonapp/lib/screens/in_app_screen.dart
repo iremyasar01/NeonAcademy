@@ -19,6 +19,7 @@ class _InAppScreenState extends State<InAppScreen> {
     
 //simüle ediyor çünkü gerçek ödeme işlemini simülatörde yapamadım.
 //gerçek cihazda developer hesabı artı StoreKit.
+//adapty kütüphanesi apple develeloper hesabına key veriyo.
     final success = (DateTime.now().second % 2 == 0);
 // Simulüle ediyor başarılı olup olmamasını rastgele vermek adına.
     if (!mounted) return;
