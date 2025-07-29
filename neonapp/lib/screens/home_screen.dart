@@ -3,6 +3,7 @@ import 'package:neonapp/screens/ad_screen.dart';
 import 'package:neonapp/screens/comedy_screen.dart';
 import 'package:neonapp/screens/flexible_screen.dart';
 import 'package:neonapp/screens/future_tech_screen.dart';
+import 'package:neonapp/screens/splash_screen.dart';
 import 'package:neonapp/screens/travel_screen.dart';
 import 'package:neonapp/screens/welcome_screen.dart';
 import 'package:neonapp/widgets/purchase_wrapper.dart';
@@ -91,7 +92,7 @@ class HomeScreen extends StatelessWidget {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>const WelcomeScreen()));
+                            builder: (context) => const WelcomeScreen()));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[200],
@@ -100,13 +101,13 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: const Text('Hero'),
                 ),
-                   const SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>const PurchaseWrapper()));
+                            builder: (context) => const PurchaseWrapper()));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[200],
@@ -115,13 +116,13 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: const Text('Adapty'),
                 ),
-                  const SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>const AdScreen()));
+                            builder: (context) => const AdScreen()));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[200],
@@ -129,6 +130,21 @@ class HomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                   ),
                   child: const Text('Ad'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SplashScreen()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[200],
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.all(20),
+                  ),
+                  child: const Text('Lottie'),
                 ),
               ],
             ),

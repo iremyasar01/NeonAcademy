@@ -117,7 +117,9 @@ class _AdScreenState extends State<AdScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Ad Screen')),
+      appBar: AppBar(
+        title: const Text('Ad Screen'),
+        backgroundColor: Colors.yellow[100],),
       body: Stack(
         children: [
           Center(
@@ -149,4 +151,4 @@ class _AdScreenState extends State<AdScreen> {
       ),
     );
   }
-}
+} 
