@@ -14,7 +14,7 @@ class CommentModel {
     required this.text,
     required this.timestamp,
   });
-
+  // Firestore'dan nesne oluşturma
   factory CommentModel.fromFirestore(DocumentSnapshot doc, String postId) {
     final data = doc.data() as Map<String, dynamic>;
     return CommentModel(
@@ -25,7 +25,7 @@ class CommentModel {
       timestamp: (data['timestamp'] as Timestamp).toDate(),
     );
   }
-
+  // Firestore'a gönderilecek veri
   Map<String, dynamic> toFirestore() {
     return {
       'userId': userId,

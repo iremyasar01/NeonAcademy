@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:neonfirebase/models/post_model.dart';
 import 'package:neonfirebase/screens/add_post_screen.dart';
+import 'package:neonfirebase/service/auth_service.dart';
 import 'package:neonfirebase/service/firestore_service.dart';
 import 'package:neonfirebase/widgets/postcard.dart';
 
@@ -11,6 +11,7 @@ class CommunityFeedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final FirestoreService firestoreService = FirestoreService();
+    final AuthService authService = AuthService();
 
     return Scaffold(
       appBar: AppBar(
@@ -19,7 +20,7 @@ class CommunityFeedScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => FirebaseAuth.instance.signOut(),
+            onPressed: () => authService.signOutUser(),
           )
         ],
       ),

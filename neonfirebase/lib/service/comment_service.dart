@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:neonfirebase/models/comment_model.dart';
 
 class CommentService {
@@ -10,7 +11,7 @@ class CommentService {
     required String text,
   }) async {
     try {
-      // 1. Yorum modelini oluştur
+      // Yorum modelini oluştur
       final comment = CommentModel(
         id: '', // Firestore otomatik ID oluşturacak
         postId: postId,
@@ -19,19 +20,19 @@ class CommentService {
         timestamp: DateTime.now(),
       );
 
-      // 2. Firestore'a yorumu ekle
+      // Firestore'a yorumu ekle (alt koleksiyon olarak)
       await _firestore
           .collection('posts')
           .doc(postId)
           .collection('comments')
           .add(comment.toFirestore());
-          
-      // 3. Post dokümanını güncelle (isteğe bağlı)
-      await _firestore.collection('posts').doc(postId).update({
-        'commentCount': FieldValue.increment(1),
-      });
+
+      // HATA AYIKLAMA: Başarı mesajı
+      debugPrint('✅ Yorum başarıyla eklendi: $postId');
     } catch (e) {
-      throw Exception('no comments add: $e');
+      // DETAYLI HATA MESAJI
+      debugPrint('🔥 YORUM EKLEME HATASI: $e');
+      throw Exception('Yorum eklenemedi: $e');
     }
   }
 
@@ -43,14 +44,23 @@ class CommentService {
           .collection('comments')
           .orderBy('timestamp', descending: false)
           .snapshots()
-          .map((snapshot) => snapshot.docs.map((doc) {
-                return CommentModel.fromFirestore(
-                  doc,
-                  postId, // Post ID'yi geçir
-                );
-              }).toList());
+          .handleError((error) {
+            debugPrint('🔥 YORUM GETİRME HATASI: $error');
+          })
+          .map((snapshot) {
+            // HATA AYIKLAMA: Kaç yorum geldi
+            //debugPrint('📥 $postId için ${snapshot.docs.length} yorum alındı');
+            
+            return snapshot.docs.map((doc) {
+              return CommentModel.fromFirestore(
+                doc,
+                postId,
+              );
+            }).toList();
+          });
     } catch (e) {
-      throw Exception('no comment: $e');
+      debugPrint('🔥 YORUM AKIŞI HATASI: $e');
+      throw Exception('Yorumlar getirilemedi: $e');
     }
   }
 }
