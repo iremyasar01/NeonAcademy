@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1043978903006",
+    "project_id": "neonfirebase-8f69f",
+    "storage_bucket": "neonfirebase-8f69f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1043978903006:android:585a5ea1d2f86ef06d914f",
+        "android_client_info": {
+          "package_name": "com.example.neonfirebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAr-HZmUgp2EM4ASGqIqq6CXI_wKolXQT8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
