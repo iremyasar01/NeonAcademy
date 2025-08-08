@@ -11,7 +11,6 @@ class CommentSection extends StatefulWidget {
   @override
   State<CommentSection> createState() => _CommentSectionState();
 }
-
 class _CommentSectionState extends State<CommentSection> {
   final TextEditingController _controller = TextEditingController();
   final CommentService _commentService = CommentService();
@@ -25,47 +24,56 @@ class _CommentSectionState extends State<CommentSection> {
           StreamBuilder<List<CommentModel>>(
             stream: _commentService.getComments(widget.postId),
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Column(
-                  children: snapshot.data!.map((comment) => 
-                    FutureBuilder<UserModel>(
-                      future: UserService().getUser(comment.userId),
-                      builder: (context, userSnapshot) {
-                        final username = userSnapshot.hasData
-                            ? userSnapshot.data!.displayName ?? userSnapshot.data!.email
-                            : 'Loading...';
-                        
-                        return ListTile(
-                          title: Text(username),
-                          subtitle: Text(comment.text),
-                        );
-                      },
-                    )
-                  ).toList(),
-                );
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
               }
-              return const CircularProgressIndicator();
+              
+              final comments = snapshot.data ?? [];
+              
+              return Column(
+                children: comments.map((comment) => 
+                  FutureBuilder<UserModel>(
+                    future: UserService().getUser(comment.userId),
+                    builder: (context, userSnapshot) {
+                      final username = userSnapshot.hasData
+                          ? userSnapshot.data!.displayName ?? userSnapshot.data!.email
+                          : 'Loading...';
+                      
+                      return ListTile(
+                        title: Text(username),
+                        subtitle: Text(comment.text),
+                      );
+                    },
+                  )
+                ).toList(),
+              );
             },
           ),
-          TextField(
-            controller: _controller,
-            decoration: const InputDecoration(
-              hintText: 'add comment...',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (_controller.text.isNotEmpty) {
-                _commentService.addComment(
-                  postId: widget.postId,
-                  userId: FirebaseAuth.instance.currentUser!.uid,
-                  text: _controller.text,
-                );
-                _controller.clear();
-              }
-            },
-            child: const Text('send'),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  decoration: const InputDecoration(
+                    hintText: 'add comment...',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.send),
+                onPressed: () {
+                  if (_controller.text.isNotEmpty) {
+                    _commentService.addComment(
+                      postId: widget.postId,
+                      userId: FirebaseAuth.instance.currentUser!.uid,
+                      text: _controller.text,
+                    );
+                    _controller.clear();
+                  }
+                },
+              ),
+            ],
           ),
         ],
       ),
