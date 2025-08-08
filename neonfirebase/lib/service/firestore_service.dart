@@ -2,7 +2,10 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:neonfirebase/models/post_model.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -101,4 +104,31 @@ class FirestoreService {
         .snapshots()
         .map((snapshot) => snapshot.docs.map(PostModel.fromFirestore).toList());
   }
+
+  Future<void> downloadPostImage(String imageUrl) async {
+    try {
+      // Depolama izni iste
+      final status = await Permission.storage.request();
+      if (!status.isGranted) {
+        throw Exception("Storage permission not granted");
+      }
+
+      // URL'den byte verisini çek
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode != 200) {
+        throw Exception("Failed to download image: ${response.statusCode}");
+      }
+
+      Uint8List bytes = response.bodyBytes;
+
+      // Galeriye kaydet
+      final result = await ImageGallerySaver.saveImage(bytes);
+      if (result['isSuccess'] != true) {
+        throw Exception("Image save failed");
+      }
+    } catch (e) {
+      throw Exception("Download failed: $e");
+    }
+  }
 }
+
