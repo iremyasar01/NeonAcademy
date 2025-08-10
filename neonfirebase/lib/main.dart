@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:neonfirebase/screens/home_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:neonfirebase/utils/inits/firebase_initialize.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  
+  // Firebase'i ve servisleri başlat
+  await FirebaseInitialize.firebaseInit();
+  
   runApp(const MyApp());
 }
 
