@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:neonfirebase/screens/crashlytics_screen.dart';
 import 'package:neonfirebase/screens/firestore_screen.dart';
 import 'package:neonfirebase/screens/remote_config_screen.dart';
-
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -39,8 +39,8 @@ class HomeScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                 ),
                 child: const Text('Firestore')),
-                const SizedBox(height: 16),
-                    ElevatedButton(
+            const SizedBox(height: 16),
+            ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                       context,
@@ -53,8 +53,20 @@ class HomeScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                 ),
                 child: const Text('Remote Config')),
-                  
-              
+            const SizedBox(height: 16),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CrashlyticsScreen()));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.all(20),
+                ),
+                child: const Text('Crashlytics')),
           ],
         ),
       )),
