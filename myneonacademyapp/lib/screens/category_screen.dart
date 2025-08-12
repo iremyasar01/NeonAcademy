@@ -5,7 +5,7 @@ import 'detail_screen.dart';
 class CategoryScreen extends StatelessWidget {
   final String category;
   final List<CartoonsModel> cartoons;
-  
+
   const CategoryScreen({
     super.key,
     required this.category,
@@ -15,7 +15,10 @@ class CategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(category)),
+      appBar: AppBar(
+        title: Text(category),
+        backgroundColor: Colors.blue[700],
+      ),
       body: ListView.builder(
         itemCount: cartoons.length,
         itemBuilder: (context, index) {
@@ -27,8 +30,8 @@ class CategoryScreen extends StatelessWidget {
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => 
-                      const Icon(Icons.image),
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.image),
                   )
                 : const Icon(Icons.image),
             title: Text(cartoon.title ?? ''),

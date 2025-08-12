@@ -25,7 +25,7 @@ class CartoonApiService {
             .where((cartoon) => cartoon.id != null && cartoon.id! <= 23)
             .toList();
 
-        debugPrint('ID <=23 olan çizgi film sayısı: ${filteredCartoons.length}');
+        debugPrint('çizgi film sayısı: ${filteredCartoons.length}');
 
         // 2. Resim URL'lerini doğrula ve geçersiz olanları asset ile değiştir
         final validatedCartoons = <CartoonsModel>[];
@@ -70,4 +70,5 @@ class CartoonApiService {
     if (url == null || url.isEmpty) return false;
     return url.startsWith('http://') || url.startsWith('https://');
   }
+  
 }

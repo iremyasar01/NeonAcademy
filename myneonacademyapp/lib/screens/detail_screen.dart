@@ -1,4 +1,3 @@
-// detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:myneonacademyapp/models/cartoons_model.dart';
 import '../utils/rating_system.dart';
@@ -15,6 +14,7 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   double _userRating = 0.0;
+  bool _isLoading = true; // Başlangıçta true olacak
 
   @override
   void initState() {
@@ -23,8 +23,41 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   void _loadRating() async {
-    final rating = await RatingSystem.getRating(widget.cartoon.id!);
-    setState(() => _userRating = rating);
+    try {
+      final rating = await RatingSystem.getRating(widget.cartoon.id);
+      if (mounted) {
+        setState(() {
+          _userRating = rating;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Puan yükleme hatası: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _saveRating(double newRating) async {
+    // Hemen arayüzü güncelle
+    setState(() => _userRating = newRating);
+    
+    try {
+      await RatingSystem.saveRating(widget.cartoon.id, newRating);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Puan kaydedildi: $newRating')),
+        );
+      }
+    } catch (e) {
+      debugPrint('Puan kaydetme hatası: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Puan kaydedilemedi!')),
+        );
+      }
+    }
   }
 
   @override
@@ -72,13 +105,14 @@ class _DetailScreenState extends State<DetailScreen> {
               ),
             const SizedBox(height: 20),
             const Text("Puanınız:", textAlign: TextAlign.center),
-            StarRating(
-              initialRating: _userRating,
-              onRatingChanged: (newRating) {
-                setState(() => _userRating = newRating);
-                RatingSystem.saveRating(widget.cartoon.id!, newRating);
-              },
-            ),
+            
+            // Yükleme durumuna göre ya yıldızları göster ya da progress
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : StarRating(
+                    initialRating: _userRating,
+                    onRatingChanged: _saveRating,
+                  ),
           ],
         ),
       ),
