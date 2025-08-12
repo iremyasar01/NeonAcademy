@@ -17,31 +17,36 @@ class CartoonApiService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        final cartoons = data.map((json) => CartoonsModel.fromJson(json)).toList();
-
-        debugPrint('Toplam çizgi film sayısı: ${cartoons.length}');
         
-        // Geçerli URL'leri asenkron olarak doğrula
+        // 1. Önce ID'ye göre filtrele (23 ve altı)
+        final filteredCartoons = data
+            .map((json) => CartoonsModel.fromJson(json))
+            .where((cartoon) => cartoon.id != null && cartoon.id! <= 23)
+            .toList();
+
+        debugPrint('çizgi film sayısı: ${filteredCartoons.length}');
+
+        // 2. Geçerli resim URL'lerini asenkron olarak doğrula
         final validCartoons = <CartoonsModel>[];
         
-        // Paralel işlem için batch'lere böl (10'ar 10'ar kontrol et)
-        for (int i = 0; i < cartoons.length; i += 10) {
-          final int end = (i + 10 < cartoons.length) ? i + 10 : cartoons.length;
-          final batch = cartoons.sublist(i, end);
+        // Paralel işlem için batch'ler halinde kontrol et
+        for (int i = 0; i < filteredCartoons.length; i += 10) {
+          final end = (i + 10 < filteredCartoons.length) 
+              ? i + 10 
+              : filteredCartoons.length;
           
-          // Bu batch'teki tüm çizgi filmleri paralel olarak kontrol et
-          final futures = batch.map((cartoon) => _isValidCartoon(cartoon));
+          final batch = filteredCartoons.sublist(i, end);
+          final futures = batch.map((c) => _isValidCartoon(c));
           final results = await Future.wait(futures);
           
-          // Geçerli olanları listeye ekle
           for (int j = 0; j < batch.length; j++) {
             if (results[j]) {
               validCartoons.add(batch[j]);
             }
           }
           
-          // Sunucuya yük bindirmemek için küçük bir bekleme
-          if (i + 10 < cartoons.length) {
+          // Sunucu yükünü azaltmak için bekleme
+          if (i + 10 < filteredCartoons.length) {
             await Future.delayed(const Duration(milliseconds: 100));
           }
         }
@@ -59,18 +64,12 @@ class CartoonApiService {
   }
 
   Future<bool> _isValidCartoon(CartoonsModel cartoon) async {
-    // Temel URL doğrulama
     if (!_isPotentiallyValidUrl(cartoon.image)) {
       return false;
     }
 
-    // HTTP status kodu kontrolü
     try {
-      final isValid = await ImageValidator.isValid(cartoon.image!);
-      if (!isValid) {
-        debugPrint('Geçersiz resim URL: ${cartoon.image} - ${cartoon.title}');
-      }
-      return isValid;
+      return await ImageValidator.isValid(cartoon.image!);
     } catch (e) {
       debugPrint('Resim doğrulama hatası: ${cartoon.image} - $e');
       return false;
@@ -79,7 +78,7 @@ class CartoonApiService {
 
   bool _isPotentiallyValidUrl(String? url) {
     if (url == null || url.isEmpty) return false;
-
+    
     try {
       final uri = Uri.parse(url);
       return uri.isAbsolute && (uri.scheme == 'http' || uri.scheme == 'https');
@@ -87,5 +86,4 @@ class CartoonApiService {
       return false;
     }
   }
-
 }
