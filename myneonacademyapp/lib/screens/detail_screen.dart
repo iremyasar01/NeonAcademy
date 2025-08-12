@@ -5,7 +5,7 @@ import '../widgets/star_rating.dart';
 
 class DetailScreen extends StatefulWidget {
   final CartoonsModel cartoon;
-  
+
   const DetailScreen({super.key, required this.cartoon});
 
   @override
@@ -29,7 +29,12 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.cartoon.title ?? "Detay")),
+      appBar: AppBar(
+        title: Text(
+          widget.cartoon.title ?? "Detay",
+        ),
+        backgroundColor: Colors.blue[700],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -61,7 +66,8 @@ class _DetailScreenState extends State<DetailScreen> {
               ],
             ),
             const SizedBox(height: 10),
-            if (widget.cartoon.creator != null && widget.cartoon.creator!.isNotEmpty)
+            if (widget.cartoon.creator != null &&
+                widget.cartoon.creator!.isNotEmpty)
               Text(
                 "Yaratıcılar: ${widget.cartoon.creator!.join(', ')}",
                 style: Theme.of(context).textTheme.bodySmall,
@@ -90,14 +96,14 @@ class _DetailScreenState extends State<DetailScreen> {
         child: const Center(child: Icon(Icons.image, size: 100)),
       );
     }
-    
+
     try {
       // Geçerli URL kontrolü
       final uri = Uri.parse(widget.cartoon.image!);
       if (!uri.isAbsolute) {
         throw const FormatException('Geçersiz URL');
       }
-      
+
       return ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: Image.network(

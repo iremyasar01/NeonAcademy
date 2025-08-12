@@ -45,7 +45,7 @@ class _CartoonScreenState extends State<CartoonScreen> {
       rethrow;
     }
   }
-
+//günün çizgi filmini random seçiyor.
   CartoonsModel? _getCartoonOfDay(List<CartoonsModel> cartoons) {
     if (cartoons.isEmpty) return null;
     final now = DateTime.now();
@@ -201,6 +201,7 @@ class _CartoonScreenState extends State<CartoonScreen> {
 
   AppBar _buildAppBar() {
     return AppBar(
+      backgroundColor: Colors.blue[700],
       title: _isSearching 
           ? TextField(
               controller: _searchController,

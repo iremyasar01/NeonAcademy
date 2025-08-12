@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:myneonacademyapp/constants/cartoon_api_constants.dart';
 import 'package:myneonacademyapp/models/cartoons_model.dart';
@@ -18,7 +19,7 @@ class CartoonApiService {
         final List<dynamic> data = json.decode(response.body);
         final cartoons = data.map((json) => CartoonsModel.fromJson(json)).toList();
 
-        print('Toplam çizgi film sayısı: ${cartoons.length}');
+        debugPrint('Toplam çizgi film sayısı: ${cartoons.length}');
         
         // Geçerli URL'leri asenkron olarak doğrula
         final validCartoons = <CartoonsModel>[];
@@ -45,14 +46,14 @@ class CartoonApiService {
           }
         }
         
-        print('Geçerli çizgi film sayısı: ${validCartoons.length}');
+        debugPrint('Geçerli çizgi film sayısı: ${validCartoons.length}');
         return validCartoons;
         
       } else {
         throw Exception('Çizgi filmler yüklenemedi: ${response.statusCode}');
       }
     } catch (e) {
-      print('API Hatası: $e');
+      debugPrint('API Hatası: $e');
       throw Exception('Bağlantı hatası: $e');
     }
   }
@@ -67,11 +68,11 @@ class CartoonApiService {
     try {
       final isValid = await ImageValidator.isValid(cartoon.image!);
       if (!isValid) {
-        print('Geçersiz resim URL: ${cartoon.image} - ${cartoon.title}');
+        debugPrint('Geçersiz resim URL: ${cartoon.image} - ${cartoon.title}');
       }
       return isValid;
     } catch (e) {
-      print('Resim doğrulama hatası: ${cartoon.image} - $e');
+      debugPrint('Resim doğrulama hatası: ${cartoon.image} - $e');
       return false;
     }
   }
