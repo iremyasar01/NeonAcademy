@@ -1,3 +1,4 @@
+// cartoon_grid_item.dart
 import 'package:flutter/material.dart';
 import '../models/cartoons_model.dart';
 
@@ -53,37 +54,27 @@ class CartoonGridItem extends StatelessWidget {
   }
 
   Widget _buildImage() {
-    // Boş URL kontrolü
-    if (cartoon.image == null || cartoon.image!.isEmpty) {
-      return Container(
-        color: Colors.grey[200],
-        child: const Center(child: Icon(Icons.image, size: 40)),
+    // Asset mi yoksa network resim mi?
+    if (cartoon.image?.startsWith('assets/') ?? false) {
+      return Image.asset(
+        cartoon.image!,
+        fit: BoxFit.cover,
       );
     }
     
-    try {
-      // Geçerli URL kontrolü
-      final uri = Uri.parse(cartoon.image!);
-      if (!uri.isAbsolute) {
-        throw const FormatException('Geçersiz URL');
-      }
-      
-      return Image.network(
-        cartoon.image!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildErrorImage();
-        },
-      );
-    } catch (e) {
-      return _buildErrorImage();
-    }
+    return Image.network(
+      cartoon.image ?? '',
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return _buildPlaceholder();
+      },
+    );
   }
 
-  Widget _buildErrorImage() {
-    return Container(
-      color: Colors.grey[200],
-      child: const Center(child: Icon(Icons.broken_image, size: 40)),
+  Widget _buildPlaceholder() {
+    return Image.asset(
+      'assets/images/no_image.png',
+      fit: BoxFit.cover,
     );
   }
 }

@@ -7,6 +7,7 @@ import 'package:myneonacademyapp/widgets/image_validator.dart';
 
 class CartoonApiService {
   static const String _baseUrl = CartoonApiConstants.baseUrl;
+  static const String _placeholderPath = 'assets/images/no_image.png';
 
   Future<List<CartoonsModel>> fetchCartoons() async {
     try {
@@ -18,41 +19,24 @@ class CartoonApiService {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         
-        // 1. Önce ID'ye göre filtrele (23 ve altı)
+        // 1. ID'ye göre filtrele (23 ve altı)
         final filteredCartoons = data
             .map((json) => CartoonsModel.fromJson(json))
             .where((cartoon) => cartoon.id != null && cartoon.id! <= 23)
             .toList();
 
-        debugPrint('çizgi film sayısı: ${filteredCartoons.length}');
+        debugPrint('ID <=23 olan çizgi film sayısı: ${filteredCartoons.length}');
 
-        // 2. Geçerli resim URL'lerini asenkron olarak doğrula
-        final validCartoons = <CartoonsModel>[];
+        // 2. Resim URL'lerini doğrula ve geçersiz olanları asset ile değiştir
+        final validatedCartoons = <CartoonsModel>[];
         
-        // Paralel işlem için batch'ler halinde kontrol et
-        for (int i = 0; i < filteredCartoons.length; i += 10) {
-          final end = (i + 10 < filteredCartoons.length) 
-              ? i + 10 
-              : filteredCartoons.length;
-          
-          final batch = filteredCartoons.sublist(i, end);
-          final futures = batch.map((c) => _isValidCartoon(c));
-          final results = await Future.wait(futures);
-          
-          for (int j = 0; j < batch.length; j++) {
-            if (results[j]) {
-              validCartoons.add(batch[j]);
-            }
-          }
-          
-          // Sunucu yükünü azaltmak için bekleme
-          if (i + 10 < filteredCartoons.length) {
-            await Future.delayed(const Duration(milliseconds: 100));
-          }
+        for (var cartoon in filteredCartoons) {
+          final validated = await _validateImage(cartoon);
+          validatedCartoons.add(validated);
         }
         
-        debugPrint('Geçerli çizgi film sayısı: ${validCartoons.length}');
-        return validCartoons;
+        debugPrint('Doğrulanmış çizgi film sayısı: ${validatedCartoons.length}');
+        return validatedCartoons;
         
       } else {
         throw Exception('Çizgi filmler yüklenemedi: ${response.statusCode}');
@@ -63,27 +47,27 @@ class CartoonApiService {
     }
   }
 
-  Future<bool> _isValidCartoon(CartoonsModel cartoon) async {
-    if (!_isPotentiallyValidUrl(cartoon.image)) {
-      return false;
-    }
-
+  Future<CartoonsModel> _validateImage(CartoonsModel cartoon) async {
     try {
-      return await ImageValidator.isValid(cartoon.image!);
+      // URL geçerli mi?
+      final isValidUrl = _isPotentiallyValidUrl(cartoon.image);
+      
+      // URL geçerliyse ve erişilebilirse olduğu gibi bırak
+      if (isValidUrl && await ImageValidator.isValid(cartoon.image!)) {
+        return cartoon;
+      }
+      
+      // Geçersiz URL veya erişilemeyen resim için asset kullan
+      return cartoon.copyWith(image: _placeholderPath);
     } catch (e) {
-      debugPrint('Resim doğrulama hatası: ${cartoon.image} - $e');
-      return false;
+      debugPrint('Resim doğrulama hatası: ${cartoon.title} - $e');
+      return cartoon.copyWith(image: _placeholderPath);
     }
   }
+  
 
   bool _isPotentiallyValidUrl(String? url) {
     if (url == null || url.isEmpty) return false;
-    
-    try {
-      final uri = Uri.parse(url);
-      return uri.isAbsolute && (uri.scheme == 'http' || uri.scheme == 'https');
-    } catch (e) {
-      return false;
-    }
+    return url.startsWith('http://') || url.startsWith('https://');
   }
 }

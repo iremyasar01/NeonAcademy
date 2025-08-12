@@ -19,6 +19,7 @@ class CartoonsModel {
       this.episodes,
       this.image,
       this.id});
+      
 
   CartoonsModel.fromJson(Map<String, dynamic> json) {
     title = json['title'];
@@ -44,5 +45,25 @@ class CartoonsModel {
     data['image'] = image;
     data['id'] = id;
     return data;
+  }
+    // copyWith metodu ekleniyor
+  CartoonsModel copyWith({
+    int? id,
+    String? title,
+    int? year,
+    int? episodes,
+    List<String>? genre,
+    List<String>? creator,
+    String? image,
+  }) {
+    return CartoonsModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      year: year ?? this.year,
+      episodes: episodes ?? this.episodes,
+      genre: genre ?? this.genre,
+      creator: creator ?? this.creator,
+      image: image ?? this.image,
+    );
   }
 }

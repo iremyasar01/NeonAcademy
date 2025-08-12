@@ -1,3 +1,4 @@
+// detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:myneonacademyapp/models/cartoons_model.dart';
 import '../utils/rating_system.dart';
@@ -30,9 +31,7 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.cartoon.title ?? "Detay",
-        ),
+        title: Text(widget.cartoon.title ?? "Detay"),
         backgroundColor: Colors.blue[700],
       ),
       body: SingleChildScrollView(
@@ -66,8 +65,7 @@ class _DetailScreenState extends State<DetailScreen> {
               ],
             ),
             const SizedBox(height: 10),
-            if (widget.cartoon.creator != null &&
-                widget.cartoon.creator!.isNotEmpty)
+            if (widget.cartoon.creator != null && widget.cartoon.creator!.isNotEmpty)
               Text(
                 "Yaratıcılar: ${widget.cartoon.creator!.join(', ')}",
                 style: Theme.of(context).textTheme.bodySmall,
@@ -88,44 +86,42 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget _buildImage() {
-    // Boş URL kontrolü
-    if (widget.cartoon.image == null || widget.cartoon.image!.isEmpty) {
-      return Container(
-        height: 250,
-        color: Colors.grey[200],
-        child: const Center(child: Icon(Icons.image, size: 100)),
-      );
-    }
-
-    try {
-      // Geçerli URL kontrolü
-      final uri = Uri.parse(widget.cartoon.image!);
-      if (!uri.isAbsolute) {
-        throw const FormatException('Geçersiz URL');
-      }
-
+    if (widget.cartoon.image?.startsWith('assets/') ?? false) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: Image.network(
+        child: Image.asset(
           widget.cartoon.image!,
           height: 250,
           width: double.infinity,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return _buildErrorImage();
-          },
         ),
       );
-    } catch (e) {
-      return _buildErrorImage();
     }
+    
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Image.network(
+        widget.cartoon.image ?? '',
+        height: 250,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildPlaceholder();
+        },
+      ),
+    );
   }
 
-  Widget _buildErrorImage() {
+  Widget _buildPlaceholder() {
     return Container(
       height: 250,
       color: Colors.grey[200],
-      child: const Center(child: Icon(Icons.broken_image, size: 100)),
+      child: Center(
+        child: Image.asset(
+          'assets/images/no_image.png',
+          height: 200,
+        ),
+      ),
     );
   }
 }
