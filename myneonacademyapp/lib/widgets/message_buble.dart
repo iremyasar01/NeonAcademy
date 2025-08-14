@@ -48,7 +48,7 @@ class MessageBubble extends StatelessWidget {
             children: [
               if (showName)
                 Text(
-                  message.name,
+                  message.name!,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: message.name == "Barbie" ? Colors.pink[800] : Colors.blue[800],
@@ -57,7 +57,7 @@ class MessageBubble extends StatelessWidget {
               if (showName) const SizedBox(height: 6),
               
               Text(
-                message.body,
+                message.body!,
                 style: TextStyle(
                   color: message.name == "Barbie" ? Colors.pink[900] : Colors.blue[900],
                   fontSize: 16,
@@ -69,7 +69,7 @@ class MessageBubble extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    DateFormat('HH:mm').format(message.time),
+                    DateFormat('HH:mm').format(message.time!),
                     style: TextStyle(
                       fontSize: 10,
                       color: message.name == "Barbie" ? Colors.pink[700] : Colors.blue[700],

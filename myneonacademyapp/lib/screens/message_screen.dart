@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myneonacademyapp/services/message_api_service.dart';
+import 'package:myneonacademyapp/widgets/ken_typing_indicator.dart';
 import 'package:myneonacademyapp/widgets/message_buble.dart';
 import '../models/message_model.dart';
 import '../widgets/user_selector.dart';
@@ -178,7 +179,7 @@ class _MessageScreenState extends State<MessageScreen> {
                 itemBuilder: (context, index) {
                   // Ken yazıyor göstergesi
                   if (index == messages.length && isKenTyping) {
-                    return _buildTypingIndicator();
+                    return const KenTypingIndicator();
                   }
                   
                   final message = messages[index];
@@ -199,53 +200,6 @@ class _MessageScreenState extends State<MessageScreen> {
               controller: _messageController,
               onSendPressed: _sendMessage,
               onSubmitted: (_) => _sendMessage(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTypingIndicator() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.blue[50],
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-            bottomRight: Radius.circular(16),
-            bottomLeft: Radius.circular(4),
-          ),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 2,
-              offset: Offset(0, 1),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Ken yazıyor",
-              style: TextStyle(
-                color: Colors.blue[700],
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            const SizedBox(width: 8),
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[300]!),
-              ),
             ),
           ],
         ),
