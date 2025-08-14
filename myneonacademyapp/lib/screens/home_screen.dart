@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myneonacademyapp/screens/cartoon_screen.dart';
+import 'package:myneonacademyapp/screens/message_screen.dart';
 
 
 class HomeScreen extends StatelessWidget {
@@ -23,6 +24,16 @@ class HomeScreen extends StatelessWidget {
                 );
               },
               child: const Text('API’s'),
+            ),
+            const SizedBox(height: 16),
+              ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MessageScreen()),
+                );
+              },
+              child: const Text('Http Request'),
             ),
             const SizedBox(height: 16),
             
