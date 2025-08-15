@@ -12,7 +12,7 @@ class SuccessDialog extends StatelessWidget {
         side: BorderSide(color: Colors.amber.shade600, width: 2),
       ),
       title: const Text(
-        'Kayıt Başarılı!',
+        'Registration Successful!',
         style: TextStyle(color: Colors.amber),
         textAlign: TextAlign.center,
       ),
@@ -22,7 +22,7 @@ class SuccessDialog extends StatelessWidget {
           Icon(Icons.check_circle, color: Colors.green[300], size: 60),
           const SizedBox(height: 20),
           const Text(
-            'Vatandaş bilgileri Asgard Arşivlerine kaydedildi',
+            "Citizen information has been saved to the Archives",
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white70),
           ),
@@ -37,7 +37,7 @@ class SuccessDialog extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Devam Et', style: TextStyle(color: Colors.black)),
+            child: const Text('Continue', style: TextStyle(color: Colors.black)),
             onPressed: () => Navigator.pop(context),
           ),
         ),
