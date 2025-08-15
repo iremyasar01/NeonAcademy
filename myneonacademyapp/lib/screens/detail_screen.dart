@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myneonacademyapp/models/cartoons_model.dart';
 import '../utils/rating_system.dart';
-import '../widgets/star_rating.dart';
+import '../widgets/Api/star_rating.dart';
 
 class DetailScreen extends StatefulWidget {
   final CartoonsModel cartoon;

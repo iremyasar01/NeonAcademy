@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/cartoons_model.dart';
+import '../../models/cartoons_model.dart';
 
 class CartoonOfDayCard extends StatelessWidget {
   final CartoonsModel cartoon;

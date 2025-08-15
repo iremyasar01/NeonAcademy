@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:myneonacademyapp/services/message_api_service.dart';
-import 'package:myneonacademyapp/widgets/ken_typing_indicator.dart';
-import 'package:myneonacademyapp/widgets/message_buble.dart';
+import 'package:myneonacademyapp/widgets/Http/ken_typing_indicator.dart';
+import 'package:myneonacademyapp/widgets/Http/message_buble.dart';
 import '../models/message_model.dart';
-import '../widgets/user_selector.dart';
-import '../widgets/message_input.dart';
+import '../widgets/Http/user_selector.dart';
+import '../widgets/Http/message_input.dart';
 
 class MessageScreen extends StatefulWidget {
   const MessageScreen({super.key});

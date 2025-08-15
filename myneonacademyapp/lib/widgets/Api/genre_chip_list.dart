@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:myneonacademyapp/models/cartoons_model.dart';
 import 'package:myneonacademyapp/screens/category_screen.dart';
 
-
 class GenreChipList extends StatelessWidget {
   final List<String> genres;
   final List<CartoonsModel> cartoons;

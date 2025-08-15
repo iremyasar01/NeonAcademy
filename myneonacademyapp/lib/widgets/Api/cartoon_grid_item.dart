@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/cartoons_model.dart';
+import '../../models/cartoons_model.dart';
 
 class CartoonGridItem extends StatelessWidget {
   final CartoonsModel cartoon;

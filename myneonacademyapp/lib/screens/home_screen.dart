@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myneonacademyapp/screens/cartoon_screen.dart';
+import 'package:myneonacademyapp/screens/citizen_form_screen.dart';
 import 'package:myneonacademyapp/screens/melody_maker_screen.dart';
 import 'package:myneonacademyapp/screens/message_screen.dart';
 
@@ -47,7 +48,16 @@ class HomeScreen extends StatelessWidget {
               child: const Text('Dio'),
             ),
             const SizedBox(height: 16),
-            
+              ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CitizenFormScreen()),
+                );
+              },
+              child: const Text('SQLite'),
+            ),
+            const SizedBox(height: 16),
             
           ],
         ),

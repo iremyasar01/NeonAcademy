@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:myneonacademyapp/constants/cartoon_app_constants.dart';
 import 'package:myneonacademyapp/models/cartoons_model.dart';
 import 'package:myneonacademyapp/services/cartoon_api_service.dart';
-import '../widgets/cartoon_of_day_card.dart';
-import '../widgets/genre_chip_list.dart';
-import '../widgets/section_title.dart';
-import '../widgets/cartoon_grid_item.dart';
+import '../widgets/Api/cartoon_of_day_card.dart';
+import '../widgets/Api/genre_chip_list.dart';
+import '../widgets/Api/section_title.dart';
+import '../widgets/Api/cartoon_grid_item.dart';
 import 'detail_screen.dart';
 
 class CartoonScreen extends StatefulWidget {

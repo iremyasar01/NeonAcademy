@@ -3,11 +3,11 @@ import 'package:myneonacademyapp/models/track_model.dart';
 import 'package:myneonacademyapp/services/audio_service.dart';
 import 'package:myneonacademyapp/services/music_api_service.dart';
 import 'package:myneonacademyapp/utils/music_result.dart';
-import 'package:myneonacademyapp/widgets/empty_state.dart';
-import 'package:myneonacademyapp/widgets/music_search_bar.dart';
-import 'package:myneonacademyapp/widgets/now_playing_bar.dart';
-import 'package:myneonacademyapp/widgets/recommend_header.dart';
-import 'package:myneonacademyapp/widgets/track_card.dart';
+import 'package:myneonacademyapp/widgets/Dio/empty_state.dart';
+import 'package:myneonacademyapp/widgets/Dio/music_search_bar.dart';
+import 'package:myneonacademyapp/widgets/Dio/now_playing_bar.dart';
+import 'package:myneonacademyapp/widgets/Dio/recommend_header.dart';
+import 'package:myneonacademyapp/widgets/Dio/track_card.dart';
 
 class MelodyMakerScreen extends StatefulWidget {
   const MelodyMakerScreen({super.key});
@@ -67,9 +67,10 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
       final results = await _musicService.searchTracks(_searchTerm);
       setState(() => _tracks = results);
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Hata: $e')),
-      );
+     );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -196,7 +197,7 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
           children: [
             const CircularProgressIndicator(),
             const SizedBox(height: 20),
-            Text('"$_searchTerm" aranıyor...'),
+            Text('Searching for "$_searchTerm"...'),
           ],
         ),
       ),
