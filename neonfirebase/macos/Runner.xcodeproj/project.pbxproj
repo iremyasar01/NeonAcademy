@@ -212,7 +212,7 @@
 				33CC10EB2044A3C60003C045 /* Resources */,
 				33CC110E2044A8840003C045 /* Bundle Framework */,
 				3399D490228B24CF009A79C7 /* ShellScript */,
-				4EC2493662C04F8055E0A125 /* FlutterFire: "flutterfire upload-crashlytics-symbols" */,
+				EA452BDA5EE7C87B9E1CD1DA /* FlutterFire: "flutterfire upload-crashlytics-symbols" */,
 			);
 			buildRules = (
 			);
@@ -334,7 +334,7 @@
 			shellPath = /bin/sh;
 			shellScript = "\"$FLUTTER_ROOT\"/packages/flutter_tools/bin/macos_assemble.sh && touch Flutter/ephemeral/tripwire";
 		};
-		4EC2493662C04F8055E0A125 /* FlutterFire: "flutterfire upload-crashlytics-symbols" */ = {
+		EA452BDA5EE7C87B9E1CD1DA /* FlutterFire: "flutterfire upload-crashlytics-symbols" */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (

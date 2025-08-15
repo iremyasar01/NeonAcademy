@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:neonfirebase/service/crashlytics_service.dart';
 import 'package:neonfirebase/widgets/crash_button.dart';
-import 'package:neonfirebase/widgets/crash_dialog_dart';
+import 'package:neonfirebase/widgets/crash_dialog.dart';
 import 'package:neonfirebase/widgets/crashlytics_header.dart';
 import 'package:neonfirebase/widgets/crashlytics_title_section.dart';
 import 'package:neonfirebase/widgets/crashlytics_warning.dart';
