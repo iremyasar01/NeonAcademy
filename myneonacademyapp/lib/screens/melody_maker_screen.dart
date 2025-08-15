@@ -17,25 +17,29 @@ class MelodyMakerScreen extends StatefulWidget {
 }
 
 class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
+  // Servisler
   final MusicApiService _musicService = MusicApiService();
   final AudioPlayerService _audioService = AudioPlayerService();
+
+  // Controller
   final TextEditingController _searchController = TextEditingController();
-  
-  List<Track> _tracks = [];
-  List<Track> _recommendedTracks = [];
-  bool _isLoading = false;
-  bool _isRecommendedLoading = false;
-  String? _currentlyPlayingUrl;
-  bool _isPlaying = false;
-  String _searchTerm = '';
+
+  // State değişkenleri
+  List<Track> _tracks = []; // Arama sonuçları
+  List<Track> _recommendedTracks = []; // Önerilen parçalar
+  bool _isLoading = false; // Arama yükleme durumu
+  bool _isRecommendedLoading = false; // Önerilenler yükleme durumu
+  String? _currentlyPlayingUrl; // Çalan şarkı URL'si
+  bool _isPlaying = false; // Çalma durumu
+  String _searchTerm = ''; // Arama terimi
 
   @override
   void initState() {
     super.initState();
-    _loadRecommendedTracks();
+    _loadRecommendedTracks(); // Ekran açıldığında önerilen parçaları yükle
   }
 
-  // Önerilen parçaları yükle
+  /// Önerilen parçaları yükler
   void _loadRecommendedTracks() async {
     setState(() => _isRecommendedLoading = true);
     try {
@@ -47,19 +51,18 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
     }
   }
 
-  // Arama fonksiyonu
+  /// Arama işlemini gerçekleştirir
   void _search() async {
     if (_searchController.text.isEmpty) return;
-    
+
     await _audioService.stopPreview();
     setState(() {
       _currentlyPlayingUrl = null;
       _isPlaying = false;
       _searchTerm = _searchController.text;
+      _isLoading = true;
     });
 
-    setState(() => _isLoading = true);
-    
     try {
       final results = await _musicService.searchTracks(_searchTerm);
       setState(() => _tracks = results);
@@ -72,7 +75,7 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
     }
   }
 
-  // Oynat/Duraklat fonksiyonu
+  /// Oynatma/Duraklatma işlemini kontrol eder
   void _handlePlayPressed(String url) async {
     if (_currentlyPlayingUrl == url) {
       if (_isPlaying) {
@@ -92,7 +95,7 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
     }
   }
 
-  // Arama temizleme fonksiyonu
+  /// Arama çubuğunu temizler
   void _clearSearch() {
     _searchController.clear();
     setState(() {
@@ -114,8 +117,13 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Üst menü
       appBar: AppBar(
-        title: const Text('MelodyMaker', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.blue[200],
+        title: const Text(
+          'MelodyMaker',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         actions: [
           if (_searchTerm.isNotEmpty)
@@ -125,40 +133,41 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
             ),
         ],
       ),
+
+      // Ana içerik
       body: Column(
         children: [
-          // Arama çubuğu widget'ı
+          // Arama çubuğu
           SearchBarWidget(
             controller: _searchController,
             onSearch: _search,
             onClear: _clearSearch,
           ),
-          
+
           // Arama sonuçları başlığı
           if (_searchTerm.isNotEmpty && !_isLoading)
             ResultsHeader(searchTerm: _searchTerm, trackCount: _tracks.length),
-          
+
           // Önerilenler başlığı
           if (_searchTerm.isEmpty && !_isRecommendedLoading)
             RecommendedHeader(onRefresh: _loadRecommendedTracks),
-          
+
           const SizedBox(height: 10),
-          
+
           // İçerik alanı
-          _buildContentArea()
+          _buildContentArea(),
         ],
       ),
-      // Şu anda çalan çubuk
+
+      // Çalan parça çubuğu
       bottomNavigationBar: _buildNowPlayingBar(),
     );
   }
 
-  // Ana içerik alanını oluştur
+  /// İçerik alanını belirler
   Widget _buildContentArea() {
-    if (_isLoading) {
-      return _buildLoadingIndicator();
-    }
-    
+    if (_isLoading) return _buildLoadingIndicator();
+
     if (_searchTerm.isNotEmpty) {
       return _tracks.isEmpty
           ? const EmptyStateWidget(
@@ -168,15 +177,17 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
             )
           : _buildTrackList();
     }
-    
+
     if (_isRecommendedLoading) {
-      return const Expanded(child: Center(child: CircularProgressIndicator()));
+      return const Expanded(
+        child: Center(child: CircularProgressIndicator()),
+      );
     }
-    
+
     return _buildRecommendedGrid();
   }
 
-  // Yükleme göstergesi
+  /// Arama sırasında yükleme göstergesi
   Widget _buildLoadingIndicator() {
     return Expanded(
       child: Center(
@@ -192,7 +203,7 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
     );
   }
 
-  // Parça listesi (arama sonuçları)
+  /// Arama sonuçları listesi
   Widget _buildTrackList() {
     return Expanded(
       child: ListView.builder(
@@ -201,7 +212,7 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
         itemBuilder: (context, index) {
           final track = _tracks[index];
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TrackCard(
               track: track,
               isPlaying: _currentlyPlayingUrl == track.previewUrl && _isPlaying,
@@ -214,23 +225,24 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
     );
   }
 
-  // Önerilen parçalar grid'i
+  /// Önerilen parçalar grid görünümü
   Widget _buildRecommendedGrid() {
     return Expanded(
       child: GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+          crossAxisCount: 2, // Sütun sayısı
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
           childAspectRatio: 0.7,
         ),
         itemCount: _recommendedTracks.length,
         itemBuilder: (context, index) {
+          final track = _recommendedTracks[index];
           return TrackCard(
-            track: _recommendedTracks[index],
-            isPlaying: _currentlyPlayingUrl == _recommendedTracks[index].previewUrl && _isPlaying,
-            onPlayPressed: () => _handlePlayPressed(_recommendedTracks[index].previewUrl),
+            track: track,
+            isPlaying: _currentlyPlayingUrl == track.previewUrl && _isPlaying,
+            onPlayPressed: () => _handlePlayPressed(track.previewUrl),
             isListMode: false,
           );
         },
@@ -238,17 +250,17 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
     );
   }
 
-  // Şu anda çalan çubuk
+  /// Şu anda çalan parçayı gösteren alt bar
   Widget? _buildNowPlayingBar() {
     if (_currentlyPlayingUrl == null) return null;
-    
+
     final currentTrack = _tracks.firstWhere(
       (track) => track.previewUrl == _currentlyPlayingUrl,
       orElse: () => _recommendedTracks.firstWhere(
         (track) => track.previewUrl == _currentlyPlayingUrl,
       ),
     );
-    
+
     return NowPlayingBar(
       track: currentTrack,
       isPlaying: _isPlaying,
