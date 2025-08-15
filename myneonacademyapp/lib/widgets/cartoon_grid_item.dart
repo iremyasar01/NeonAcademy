@@ -1,4 +1,3 @@
-// cartoon_grid_item.dart
 import 'package:flutter/material.dart';
 import '../models/cartoons_model.dart';
 

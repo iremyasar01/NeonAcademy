@@ -106,4 +106,16 @@ class MusicApiService {
       throw Exception('Bilinmeyen hata: $e');
     }
   }
+  // In MusicApiService class, add this method:
+Future<List<Track>> getRecommendedTracks() async {
+  try {
+    // Using different search terms to get variety
+    final terms = ['selena gomez', 'taylor swift', 'ariana grande'];
+    final randomTerm = terms[DateTime.now().second % terms.length];
+    return searchTracks(randomTerm);
+  } catch (e) {
+    debugPrint('Error getting recommended tracks: $e');
+    return [];
+  }
+}
 }

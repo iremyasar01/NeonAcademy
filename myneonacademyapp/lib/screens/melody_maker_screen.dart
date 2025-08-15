@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:myneonacademyapp/models/track_model.dart';
 import 'package:myneonacademyapp/services/audio_service.dart';
 import 'package:myneonacademyapp/services/music_api_service.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:myneonacademyapp/utils/music_result.dart';
+import 'package:myneonacademyapp/widgets/empty_state.dart';
+import 'package:myneonacademyapp/widgets/music_search_bar.dart';
+import 'package:myneonacademyapp/widgets/now_playing_bar.dart';
+import 'package:myneonacademyapp/widgets/recommend_header.dart';
+import 'package:myneonacademyapp/widgets/track_card.dart';
 
 class MelodyMakerScreen extends StatefulWidget {
   const MelodyMakerScreen({super.key});
@@ -17,15 +22,35 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
   final TextEditingController _searchController = TextEditingController();
   
   List<Track> _tracks = [];
+  List<Track> _recommendedTracks = [];
   bool _isLoading = false;
+  bool _isRecommendedLoading = false;
   String? _currentlyPlayingUrl;
   bool _isPlaying = false;
   String _searchTerm = '';
 
+  @override
+  void initState() {
+    super.initState();
+    _loadRecommendedTracks();
+  }
+
+  // Önerilen parçaları yükle
+  void _loadRecommendedTracks() async {
+    setState(() => _isRecommendedLoading = true);
+    try {
+      _recommendedTracks = await _musicService.getRecommendedTracks();
+    } catch (e) {
+      debugPrint('Önerilen parça yükleme hatası: $e');
+    } finally {
+      setState(() => _isRecommendedLoading = false);
+    }
+  }
+
+  // Arama fonksiyonu
   void _search() async {
     if (_searchController.text.isEmpty) return;
     
-    // Önceki oynatmayı durdur
     await _audioService.stopPreview();
     setState(() {
       _currentlyPlayingUrl = null;
@@ -40,16 +65,16 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
       setState(() => _tracks = results);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text('Hata: $e')),
       );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
+  // Oynat/Duraklat fonksiyonu
   void _handlePlayPressed(String url) async {
     if (_currentlyPlayingUrl == url) {
-      // Aynı parçaya basıldı: Play/Pause toggle
       if (_isPlaying) {
         await _audioService.pausePreview();
         setState(() => _isPlaying = false);
@@ -58,7 +83,6 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
         setState(() => _isPlaying = true);
       }
     } else {
-      // Yeni parça seçildi
       await _audioService.stopPreview();
       await _audioService.playPreview(url);
       setState(() {
@@ -68,6 +92,7 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
     }
   }
 
+  // Arama temizleme fonksiyonu
   void _clearSearch() {
     _searchController.clear();
     setState(() {
@@ -90,7 +115,8 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MelodyMaker'),
+        title: const Text('MelodyMaker', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
         actions: [
           if (_searchTerm.isNotEmpty)
             IconButton(
@@ -101,177 +127,132 @@ class _MelodyMakerScreenState extends State<MelodyMakerScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      labelText: 'Artist, Song or Album',
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: _clearSearch,
-                            )
-                          : null,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                    ),
-                    onSubmitted: (_) => _search(),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.search),
-                  label: const Text('Search'),
-                  onPressed: _search,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          // Arama çubuğu widget'ı
+          SearchBarWidget(
+            controller: _searchController,
+            onSearch: _search,
+            onClear: _clearSearch,
           ),
+          
+          // Arama sonuçları başlığı
           if (_searchTerm.isNotEmpty && !_isLoading)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  Text(
-                    'Results for "$_searchTerm"',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const Spacer(),
-                  Text(
-                    '${_tracks.length} tracks',
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
+            ResultsHeader(searchTerm: _searchTerm, trackCount: _tracks.length),
+          
+          // Önerilenler başlığı
+          if (_searchTerm.isEmpty && !_isRecommendedLoading)
+            RecommendedHeader(onRefresh: _loadRecommendedTracks),
+          
           const SizedBox(height: 10),
-          _isLoading
-              ? Expanded(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const CircularProgressIndicator(),
-                        const SizedBox(height: 20),
-                        Text('Searching for "$_searchTerm"...'),
-                      ],
-                    ),
-                  ),
-                )
-              : _tracks.isEmpty
-                  ? const Expanded(
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                             Icon(Icons.music_note, size: 80, color: Colors.grey),
-                             SizedBox(height: 20),
-                             Text(
-                              'Search for your favorite music',
-                              style: TextStyle(fontSize: 18, color: Colors.grey),
-                            ),
-                             SizedBox(height: 10),
-                             Text(
-                              'Try searching for artists, songs, or albums',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  : Expanded(
-                      child: ListView.builder(
-                        itemCount: _tracks.length,
-                        itemBuilder: (context, index) {
-                          final track = _tracks[index];
-                          final isCurrentTrackPlaying = _currentlyPlayingUrl == track.previewUrl && _isPlaying;
-                          
-                          return ListTile(
-                            leading: CachedNetworkImage(
-                              imageUrl: track.artworkUrl100,
-                              placeholder: (_, __) => const CircularProgressIndicator(),
-                              errorWidget: (_, __, ___) => const Icon(Icons.music_note),
-                              width: 50,
-                              height: 50,
-                            ),
-                            title: Text(track.trackName),
-                            subtitle: Text(track.artistName),
-                            trailing: IconButton(
-                              icon: Icon(
-                                isCurrentTrackPlaying ? Icons.pause : Icons.play_arrow,
-                                color: isCurrentTrackPlaying ? Colors.blue : null,
-                              ),
-                              onPressed: () => _handlePlayPressed(track.previewUrl),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+          
+          // İçerik alanı
+          _buildContentArea()
         ],
       ),
-      bottomNavigationBar: _currentlyPlayingUrl != null
-          ? Container(
-              height: 70,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                border: const Border(top: BorderSide(color: Colors.blue)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.music_note, color: Colors.blue, size: 30),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _tracks
-                              .firstWhere((track) => track.previewUrl == _currentlyPlayingUrl)
-                              .trackName,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          _tracks
-                              .firstWhere((track) => track.previewUrl == _currentlyPlayingUrl)
-                              .artistName,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      _isPlaying ? Icons.pause_circle : Icons.play_circle,
-                      color: Colors.blue,
-                      size: 36,
-                    ),
-                    onPressed: () {
-                      if (_currentlyPlayingUrl != null) {
-                        _handlePlayPressed(_currentlyPlayingUrl!);
-                      }
-                    },
-                  ),
-                ],
-              ),
+      // Şu anda çalan çubuk
+      bottomNavigationBar: _buildNowPlayingBar(),
+    );
+  }
+
+  // Ana içerik alanını oluştur
+  Widget _buildContentArea() {
+    if (_isLoading) {
+      return _buildLoadingIndicator();
+    }
+    
+    if (_searchTerm.isNotEmpty) {
+      return _tracks.isEmpty
+          ? const EmptyStateWidget(
+              icon: Icons.search_off,
+              title: 'No tracks found',
+              subtitle: 'Try a different search term',
             )
-          : null,
+          : _buildTrackList();
+    }
+    
+    if (_isRecommendedLoading) {
+      return const Expanded(child: Center(child: CircularProgressIndicator()));
+    }
+    
+    return _buildRecommendedGrid();
+  }
+
+  // Yükleme göstergesi
+  Widget _buildLoadingIndicator() {
+    return Expanded(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 20),
+            Text('"$_searchTerm" aranıyor...'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Parça listesi (arama sonuçları)
+  Widget _buildTrackList() {
+    return Expanded(
+      child: ListView.builder(
+        padding: const EdgeInsets.only(bottom: 80),
+        itemCount: _tracks.length,
+        itemBuilder: (context, index) {
+          final track = _tracks[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+            child: TrackCard(
+              track: track,
+              isPlaying: _currentlyPlayingUrl == track.previewUrl && _isPlaying,
+              onPlayPressed: () => _handlePlayPressed(track.previewUrl),
+              isListMode: true,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Önerilen parçalar grid'i
+  Widget _buildRecommendedGrid() {
+    return Expanded(
+      child: GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.7,
+        ),
+        itemCount: _recommendedTracks.length,
+        itemBuilder: (context, index) {
+          return TrackCard(
+            track: _recommendedTracks[index],
+            isPlaying: _currentlyPlayingUrl == _recommendedTracks[index].previewUrl && _isPlaying,
+            onPlayPressed: () => _handlePlayPressed(_recommendedTracks[index].previewUrl),
+            isListMode: false,
+          );
+        },
+      ),
+    );
+  }
+
+  // Şu anda çalan çubuk
+  Widget? _buildNowPlayingBar() {
+    if (_currentlyPlayingUrl == null) return null;
+    
+    final currentTrack = _tracks.firstWhere(
+      (track) => track.previewUrl == _currentlyPlayingUrl,
+      orElse: () => _recommendedTracks.firstWhere(
+        (track) => track.previewUrl == _currentlyPlayingUrl,
+      ),
+    );
+    
+    return NowPlayingBar(
+      track: currentTrack,
+      isPlaying: _isPlaying,
+      onPlayPressed: () => _handlePlayPressed(_currentlyPlayingUrl!),
     );
   }
 }
