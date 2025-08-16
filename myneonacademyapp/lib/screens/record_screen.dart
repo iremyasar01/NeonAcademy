@@ -160,8 +160,9 @@ class _RecordsScreenState extends State<RecordsScreen> {
           ? FloatingActionButton(
               backgroundColor: Colors.red[700],
               onPressed: _deleteAllCitizens,
+              tooltip: 'Delete All Citizens',
               child: const Icon(Icons.delete_sweep, color: Colors.white),
-              tooltip: 'Delete All Citizens', // Tüm Vatandaşları Sil
+              // Tüm Vatandaşları Sil
             )
           : null,
     );
