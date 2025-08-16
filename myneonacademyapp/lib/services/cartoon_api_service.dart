@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:myneonacademyapp/constants/cartoon_api_constants.dart';
 import 'package:myneonacademyapp/models/cartoons_model.dart';
-import 'package:myneonacademyapp/widgets/Api/image_validator.dart';
+import 'package:myneonacademyapp/utils/image_validator.dart';
 
 class CartoonApiService {
   static const String _baseUrl = CartoonApiConstants.baseUrl;

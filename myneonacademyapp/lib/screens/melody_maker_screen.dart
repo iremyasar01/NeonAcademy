@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myneonacademyapp/models/track_model.dart';
 import 'package:myneonacademyapp/services/audio_service.dart';
 import 'package:myneonacademyapp/services/music_api_service.dart';
-import 'package:myneonacademyapp/utils/music_result.dart';
+import 'package:myneonacademyapp/widgets/Dio/music_result.dart';
 import 'package:myneonacademyapp/widgets/Dio/empty_state.dart';
 import 'package:myneonacademyapp/widgets/Dio/music_search_bar.dart';
 import 'package:myneonacademyapp/widgets/Dio/now_playing_bar.dart';
